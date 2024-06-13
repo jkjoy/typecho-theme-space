@@ -116,3 +116,10 @@ function toc($content) {
     $html .= '</ul>'; // 结束无序列表
     return $html;
 }
+//回复加上@
+function getPermalinkFromCoid($coid) {
+	$db = Typecho_Db::get();
+	$row = $db->fetchRow($db->select('author')->from('table.comments')->where('coid = ? AND status = ?', $coid, 'approved'));
+	if (empty($row)) return '';
+	return '<a href="#comment-'.$coid.'" style="text-decoration: none;">@'.$row['author'].'</a>';
+}

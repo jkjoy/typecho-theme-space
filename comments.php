@@ -1,5 +1,4 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
-
 <?php function threadedComments($comments, $options) {
     $commentClass = '';
     if ($comments->authorId) {
@@ -11,7 +10,6 @@
     }
     $commentLevelClass = $comments->levels > 0 ? ' comment-child' : ' comment-parent';
 ?>
-
 <li id="li-<?php $comments->theId(); ?>" class="comment-body<?php
 if ($comments->levels > 0) {
     echo ' comment-child';
@@ -32,15 +30,14 @@ echo $commentClass;
                     <span class="comment-author"><?php $comments->author(); ?></span>
                     <time class="comment-time"><?php $comments->date("m月d日"); ?></time>
                 </div>
-                <div class="comment-meta-content">
+                <div class="comment-meta-content"><?php if ($comments->parent) {echo getPermalinkFromCoid($comments->parent);}?>
                     <?php $comments->content(); ?>
-                    <span class="comment-reply fa fa-reply">&nbsp;<?php $comments->reply("Reply"); ?></span>
+                    <span class="comment-reply fa fa-reply">&nbsp;<?php $comments->reply("回复"); ?></span>
                 </div>
             </div>
         </div>
         <div style="clear: both;"></div>
     </div>
-
 <?php if ($comments->children) { ?>
     <div class="comment-children">
         <?php $comments->threadedComments($options); ?>
@@ -48,7 +45,6 @@ echo $commentClass;
 <?php } ?>
 </li>
 <?php } ?>
-
 <div id="comments" class="post-comments">
       <br>
       <br>
@@ -56,14 +52,9 @@ echo $commentClass;
     <?php if ($comments->have()): ?>
     <p class="comments-number"><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></p>
     <br>
-
     <?php $comments->listComments(); ?>
-
     <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
-
     <?php endif; ?>
-
-
 <?php if($this->allow('comment')): ?>
     <div id="<?php $this->respondId(); ?>" class="respond">
         <div class="cancel-comment-reply">
@@ -75,13 +66,13 @@ echo $commentClass;
             <p><?php _e('登录身份: '); ?><a href="<?php $this->options->profileUrl(); ?>"><?php $this->user->screenName(); ?></a>. <a href="<?php $this->options->logoutUrl(); ?>" title="Logout"><?php _e('退出'); ?> &raquo;</a></p>
             <?php else: ?>
                 <div class="comments-info-box">
-                    <input type="text" name="author" id="author" class="form-control comments-user" placeholder="称呼">
-                    <input type="text" name="mail" id="mail" class="form-control comments-mail" placeholder="邮箱">
-                    <input type="text" name="url" id="url" class="form-control comments-site" placeholder="网站">
+                    <input type="text" name="author" id="author" class="form-control comments-user" placeholder="称呼,必填项">
+                    <input type="text" name="mail" id="mail" class="form-control comments-mail" placeholder="邮箱,必填项">
+                    <input type="text" name="url" id="url" class="form-control comments-site" placeholder="网站,可不填">
                 </div>
             <?php endif; ?>
             <div class="comments-text">
-                <textarea class="form-control" rows="6" name="text" id="textarea" placeholder="评论前请先F5刷新本页面"></textarea>
+                <textarea class="form-control" rows="6" name="text" id="textarea" placeholder="雁过留声,人过留名"></textarea>
             </div>
             <div class="comments-submit">
                 <button id="from_submit" type="submit"><?php _e('发射'); ?></button>
@@ -93,26 +84,6 @@ echo $commentClass;
     <?php endif; ?>
 </div>
 
-<script>
-      $("#author").blur(function(){
-        if(this.value=="" || this.value.length < 3){
-            this.value = ""
-            this.placeholder = "请输入至少3位数的昵称！"
-        }
-      })
-      $("#mail").blur(function(){
-        if(this.value=="" || (this.value!="" && !/.+@.+\.[a-zA-Z]{2,4}$/.test(this.value))){
-            this.value = ""
-            this.placeholder = "请输入正确的E-mail！"
-        }
-      })
-      $("#textarea").blur(function(){
-        if(this.value=="" || this.value.length < 3){
-            this.value = ""
-            this.placeholder = "请至少输入3字符的内容！"
-        }
-      })
-</script>
 <style>
 /*评论模板开始*/
 .post-comments{
@@ -138,6 +109,8 @@ echo $commentClass;
 }
 .comments-info-box{
 	width: 100%;
+    display: flex; /* 添加这一行 */
+    justify-content: space-between;
 }
 .comments-info-box>input{
 	width: 31.5%;
@@ -150,7 +123,7 @@ echo $commentClass;
 	color: #ccc;
 }
 input{
-	outline-color: #eee;
+	outline-color: #eeeeee;
 }
 textarea{
 	outline-color: #eee;
@@ -184,14 +157,13 @@ textarea{
 	background: #fafafa;
 	border: 1px solid #eee;
 	border-radius: 4px;
-	cursor: url(../images/pointer.cur),pointer;
 	outline: none;
 }
 /*评论列表*/
 .comments-number{
 	border-bottom: 1px dashed #eee;
-	color: #999;
-	font-size: 11pt;
+	color: #000000;
+	font-size: 24px;
 	padding-bottom: 2px;
 
 }
@@ -202,7 +174,7 @@ textarea{
 	font-size: 11pt;
 }
 .comment-list{
-
+    list-style-type: none;
 }
 .comment-list>li{
 	margin-bottom: 10px;
@@ -215,8 +187,8 @@ textarea{
 	float: left;
 }
 .comments-img{
-	width: 64px;
-	height: 64px;
+	width: 54px;
+	height: 54px;
 	display: block;
 	overflow: hidden;
 	border-radius: 6px;
@@ -246,10 +218,10 @@ textarea{
 }
 .comment-meta-info>time{
 	display: inline-block;
-	font-size: 18px;
+	font-size: 16px;
 	color: #ccc;
-	padding-left: 16px;
-	padding-top: 12px;
+	padding-left: 20px;
+	padding-top: 4px;
 }
 .comment-meta-content{
 	padding: 16px 0;
@@ -258,9 +230,9 @@ textarea{
 }	
 .comment-reply{
 	display: inline-block;
-	font-size: 18px;
+	font-size: 12px;
 	color: #666;
-	margin-top: 18px;
+	margin-top: 5px;
 }
 /*TYPECHO评论样式结束*/    
 </style>
