@@ -46,11 +46,12 @@ echo $commentClass;
 </li>
 <?php } ?>
 <div id="comments" class="post-comments">
+<p class="comments-number"><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></p>
       <br>
       <br>
     <?php $this->comments()->to($comments); ?>
     <?php if ($comments->have()): ?>
-    <p class="comments-number"><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></p>
+    
     <br>
     <?php $comments->listComments(); ?>
     <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
