@@ -33,7 +33,7 @@ echo $commentClass;
                 <div class="comment-meta-content"><?php if ($comments->parent) {echo getPermalinkFromCoid($comments->parent);}?>
                     <?php $comments->content(); ?>
                     <span class="comment-reply fa fa-reply">&nbsp;<?php $comments->reply("回复"); ?></span>
-                </div>
+                </div><br>
             </div>
         </div>
         <div style="clear: both;"></div>
@@ -46,24 +46,14 @@ echo $commentClass;
 </li>
 <?php } ?>
 <div id="comments" class="post-comments">
-<p class="comments-number"><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></p>
+<?php $this->comments()->to($comments); ?>
       <br>
       <br>
-    <?php $this->comments()->to($comments); ?>
-    <?php if ($comments->have()): ?>
-    
-    <br>
-    <?php $comments->listComments(); ?>
-    <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
-    <?php endif; ?>
     <?php if($this->allow('comment')): ?>
-    <div id="<?php $this->respondId(); ?>" class="respond">
+		<div id="<?php $this->respondId(); ?>" class="respond">
         <div class="cancel-comment-reply">
         <?php $comments->cancelReply(); ?>
         </div>
-		<?php else: ?>
-    <h3 style="text-align:center"><?php _e('评论已关闭'); ?></h3>
-    <?php endif; ?>
         <form method="post" action="<?php $this->commentUrl() ?>" id="comment-form" role="form">
             <?php if($this->user->hasLogin()): ?>
             <p><?php _e('登录身份: '); ?><a href="<?php $this->options->profileUrl(); ?>"><?php $this->user->screenName(); ?></a>. <a href="<?php $this->options->logoutUrl(); ?>" title="Logout"><?php _e('退出'); ?> &raquo;</a></p>
@@ -73,7 +63,6 @@ echo $commentClass;
                     <input type="text" name="mail" id="mail" class="form-control comments-mail" placeholder="邮箱,必填项">
                     <input type="text" name="url" id="url" class="form-control comments-site" placeholder="网站,可不填">
                 </div>
-            <?php endif; ?>
             <div class="comments-text">
                 <textarea class="form-control" rows="6" name="text" id="textarea" placeholder="雁过留声,人过留名"></textarea>
             </div>
@@ -81,10 +70,20 @@ echo $commentClass;
                 <button id="from_submit" type="submit"><?php _e('发射'); ?></button>
             </div>
         </form>
+		<br><br>
+	    <?php if ($comments->have()): ?>
+		<p class="comments-number"><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></p>
+		<br>
+    <?php $comments->listComments(); ?>
+	<br>
+    <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
+    <?php endif; ?>	
     </div>
-
+	<?php endif; ?>
+    <?php else: ?>
+    <h3 style="text-align:center"><?php _e('评论已关闭'); ?></h3>
+    <?php endif; ?>
 </div>
-
 <style>
 /*评论模板开始*/
 .post-comments{
