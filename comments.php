@@ -63,6 +63,7 @@ echo $commentClass;
                     <input type="text" name="mail" id="mail" class="form-control comments-mail" placeholder="邮箱,必填项">
                     <input type="text" name="url" id="url" class="form-control comments-site" placeholder="网站,可不填">
                 </div>
+				<?php endif; ?>	
             <div class="comments-text">
                 <textarea class="form-control" rows="6" name="text" id="textarea" placeholder="雁过留声,人过留名"></textarea>
             </div>
@@ -77,7 +78,7 @@ echo $commentClass;
     <?php $comments->listComments(); ?>
 	<br>
     <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
-    <?php endif; ?>	
+   
     </div>
 	<?php endif; ?>
     <?php else: ?>
