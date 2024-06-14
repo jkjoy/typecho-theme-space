@@ -68,7 +68,7 @@ echo $commentClass;
                 <textarea class="form-control" rows="6" name="text" id="textarea" placeholder="雁过留声,人过留名"></textarea>
             </div>
             <div class="comments-submit">
-                <button id="from_submit" type="submit"><?php _e('发射'); ?></button>
+                <button id="from_submit" type="submit"><?php _e('提交'); ?></button>
             </div>
         </form>
 		<br><br>
@@ -77,8 +77,23 @@ echo $commentClass;
 		<br>
     <?php $comments->listComments(); ?>
 	<br>
-    <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
-   
+    <?php
+            $comments->pageNav(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z" fill="var(--main)"></path></svg>',
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z" fill="var(--main)"></path></svg>',
+                1,
+                '...',
+                array(
+                    'wrapTag' => 'div',
+                    'wrapClass' => 'pagination_page',
+                    'itemTag' => '',
+                    'textTag' => 'a',
+                    'currentClass' => 'active',
+                    'prevClass' => 'prev',
+                    'nextClass' => 'next'
+                )
+            );
+        ?>
     </div>
 	<?php endif; ?>
     <?php else: ?>
@@ -86,6 +101,44 @@ echo $commentClass;
     <?php endif; ?>
 </div>
 <style>
+/* 分页 */
+.pagination_page{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: var(--margin);
+    gap: 10px;
+}
+.pagination_page li.active a {
+    background: var(--theme);
+    color: #fff;
+    font-weight: 500;
+}
+.pagination_page a{
+    display: flex;
+    padding: 12px;
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    background: var(--background);
+    border-radius: 50%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: 0.2s;
+    -webkit-transition: 0.2s;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0;
+}
+.pagination_page span.next{
+    cursor: pointer;
+}
+.pagination_page li.active a:hover{
+    cursor: not-allowed;
+}
+/* 分页 */	
 /*评论模板开始*/
 .post-comments{
 	padding-top: 50px;
