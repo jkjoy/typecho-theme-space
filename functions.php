@@ -25,29 +25,6 @@ function themeConfig($form) {
     $cssdiy = new Typecho_Widget_Helper_Form_Element_Textarea('cssdiy', NULL, NULL, _t('自定义CSS'));
     $form->addInput($cssdiy);
 }
-function themeInit($comment){
-$comment = spam_protection_pre($comment, $post, $result);
-}
-function spam_protection_math(){
-    $num1=rand(1,9);
-    $num2=rand(1,9);
-    echo '<input type="text" id="code" required name="sum" value="" placeholder="'.$num1.' + '.$num2. ' = ? *" />';
-    echo '<input type="hidden" name="num1" value="'.$num1.'" />';
-    echo '<input type="hidden" name="num2" value="'.$num2.'" />';
-}
-function spam_protection_pre($comment, $post, $result){
-    $sum=$_POST['sum'];
-    switch($sum){
-        case $_POST['num1']+$_POST['num2']:
-        break;
-        case null:
-        throw new Typecho_Widget_Exception(_t('对不起: 请输入验证码。<a href="javascript:history.back(-1)">返回上一页</a>','评论失败'));
-        break;
-        default:
-        throw new Typecho_Widget_Exception(_t('对不起: 验证码错误，请<a href="javascript:history.back(-1)">返回重试</a>。','评论失败'));
-    }
-    return $comment;
-}
 function get_post_view($archive) {
     $cid = $archive->cid;
     $db = Typecho_Db::get();
