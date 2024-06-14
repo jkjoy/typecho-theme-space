@@ -18,9 +18,9 @@ function themeConfig($form) {
     $form->addInput($zhihuUrl);
     $twitterUrl = new Typecho_Widget_Helper_Form_Element_Text('twitterUrl', NULL, 'https://x.com', _t('推特 地址'));
     $form->addInput($twitterUrl);
-    $qqboturl = new Typecho_Widget_Helper_Form_Element_Text('qqboturl', NULL, 'https://bot.asbid.cn', _t('QQ机器人API'));
+    $qqboturl = new Typecho_Widget_Helper_Form_Element_Text('qqboturl', NULL, 'https://bot.asbid.cn', _t('QQ机器人API,保持默认则需添加 2280858259 为好友'), _t('基于cqhttp,有评论时QQ通知'));
     $form->addInput($qqboturl);
-    $qqnum = new Typecho_Widget_Helper_Form_Element_Text('qqnum', NULL, NULL, _t('QQ号码'));
+    $qqnum = new Typecho_Widget_Helper_Form_Element_Text('qqnum', NULL, '80116747', _t('QQ号码'), _t('用于接收QQ通知的号码'));
     $form->addInput($qqnum);
     $bgUrl = new Typecho_Widget_Helper_Form_Element_Text('bgUrl', NULL, NULL, _t('默认头图 地址'));
     $form->addInput($bgUrl);
@@ -50,8 +50,7 @@ function get_post_view($archive) {
             $db->query($db->update('table.contents')->rows(array('views' => (int)$row['views'] + 1))->where('cid = ?', $cid));
             array_push($views, $cid);
             $views = implode(',', $views);
-            Typecho_Cookie::set('extend_contents_views', $views); //记录查看cookie
-            
+            Typecho_Cookie::set('extend_contents_views', $views); //记录查看cookie 
         }
     }
     echo $row['views'];
@@ -107,50 +106,40 @@ function getPermalinkFromCoid($coid) {
 // 评论提交通知函数
 function notifyQQBot($comment) {
     $options = Helper::options();
-
     // 检查评论是否已经审核通过
     if ($comment->status != "approved") {
         error_log('Comment is not approved.');
         return;
-    }
-    
+    } 
     // 获取配置中的QQ机器人API地址
     $cq_url = $options->qqboturl;
-    
     // 检查API地址是否为空
     if (empty($cq_url)) {
-        error_log('QQ Bot URL is empty.');
-        return;
+        error_log('QQ Bot URL is empty. Using default URL.');
+        $cq_url = 'https://bot.asbid.cn';
     }
-
     // 获取QQ号码
     $qqnum = $options->qqnum;
-
     // 检查QQ号码是否为空
     if (empty($qqnum)) {
         error_log('QQ number is empty.');
         return;
     }
-
     // 如果是管理员自己发的评论则不发送通知
     if ($comment->authorId === $comment->ownerId) {
         error_log('This comment is by the post owner.');
         return;
     }
-
     // 构建消息内容
     $msg = '「' . $comment->author . '」在文章《' . $comment->title . '》中发表了评论！';
     $msg .= "\n评论内容:\n{$comment->text}\n永久链接地址：{$comment->permalink}";
-    
     // 准备发送消息的数据
     $_message_data_ = [
         'user_id' => (int) trim($qqnum),
         'message' => str_replace(["\r\n", "\r", "\n"], "\r\n", htmlspecialchars_decode(strip_tags($msg)))
     ];
-
     // 输出调试信息
     error_log('Sending message to QQ Bot: ' . print_r($_message_data_, true));
-
     // 初始化Curl请求
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -162,14 +151,12 @@ function notifyQQBot($comment) {
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_SSL_VERIFYHOST => 0
     ]);
-    
     $response = curl_exec($ch);
-
     if (curl_errno($ch)) {
         error_log('Curl error: ' . curl_error($ch));
     } else {
         error_log('Response: ' . $response);
     }
-
     curl_close($ch);
 }
+Typecho_Plugin::factory('Widget_Feedback')->finishComment = 'notifyQQBot';
