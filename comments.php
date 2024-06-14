@@ -56,12 +56,14 @@ echo $commentClass;
     <?php $comments->listComments(); ?>
     <?php $comments->pageNav('&laquo;', '&raquo;'); ?>
     <?php endif; ?>
-<?php if($this->allow('comment')): ?>
+    <?php if($this->allow('comment')): ?>
     <div id="<?php $this->respondId(); ?>" class="respond">
         <div class="cancel-comment-reply">
         <?php $comments->cancelReply(); ?>
         </div>
-
+		<?php else: ?>
+    <h3 style="text-align:center"><?php _e('评论已关闭'); ?></h3>
+    <?php endif; ?>
         <form method="post" action="<?php $this->commentUrl() ?>" id="comment-form" role="form">
             <?php if($this->user->hasLogin()): ?>
             <p><?php _e('登录身份: '); ?><a href="<?php $this->options->profileUrl(); ?>"><?php $this->user->screenName(); ?></a>. <a href="<?php $this->options->logoutUrl(); ?>" title="Logout"><?php _e('退出'); ?> &raquo;</a></p>
@@ -80,9 +82,7 @@ echo $commentClass;
             </div>
         </form>
     </div>
-    <?php else: ?>
-    <h3 style="text-align:center"><?php _e('评论已关闭'); ?></h3>
-    <?php endif; ?>
+
 </div>
 
 <style>
