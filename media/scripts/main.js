@@ -110,39 +110,6 @@
 	};
 
 
-	
-
-	// Page Nav
-	var clickMenu = function() {
-		var topVal = ( $(window).width() < 769 ) ? 0 : 58;
-
-		$(window).resize(function(){
-			topVal = ( $(window).width() < 769 ) ? 0 : 58;		
-		});
-
-		if ( $(this).attr('href') != "#") {
-			$('#fh5co-main-nav a:not([class="external"]), #fh5co-offcanvas a:not([class="external"])').click(function(event){
-				var section = $(this).data('nav-section');
-
-
-				if ( $('div[data-section="' + section + '"]').length ) {
-
-					$('html, body').animate({
-			        	scrollTop: $('div[data-section="' + section + '"]').offset().top - topVal
-			    	}, 500);	
-			    	
-			   }
-			   event.preventDefault();
-
-			});
-		}
-
-		
-
-
-	};
-
-
 	var contentWayPoint = function() {
 		var i = 0;
 		$('.animate-box').waypoint( function( direction ) {
