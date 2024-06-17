@@ -88,9 +88,9 @@ function toc($content) {
     // 设置错误处理
     libxml_use_internal_errors(true);
 
-    // 使用 mb_convert_encoding 进行编码转换，避免直接使用 htmlentities 包裹整个内容
-    $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8');
-    $dom->loadHTML($content);
+    // 将内容包装在一个完整的 HTML 文档中，并指定 UTF-8 编码
+    $content = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $content . '</body></html>';
+    $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
     // 恢复错误处理
     libxml_use_internal_errors(false);
