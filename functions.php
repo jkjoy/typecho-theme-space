@@ -83,7 +83,7 @@ function toc($content) {
     $html = '<ul class="markdownIt-TOC">'; // 开始一个新的无序列表
     $dom = new DOMDocument();
     libxml_use_internal_errors(true);
-    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
+    $dom->loadHTML(htmlentities($content, ENT_QUOTES, 'UTF-8'));
     libxml_use_internal_errors(false);
     $xpath = new DOMXPath($dom);
     $objs = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');
