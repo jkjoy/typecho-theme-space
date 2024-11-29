@@ -16,7 +16,6 @@
 <link rel="stylesheet" href="<?php $this->options->themeUrl('/styles/main.css'); ?>">
 <!-- Modernizr JS -->
 <script src="<?php $this->options->themeUrl('/media/scripts/modernizr-2.6.2.min.js'); ?>"></script>
-<link href="https://cdn.bootcss.com/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
 <?php if($this -> options -> cssdiy): ?>
 <style><?php $this->options->cssdiy() ?></style>
 <?php endif; ?>

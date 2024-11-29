@@ -4,7 +4,7 @@
  * 来自于 gridea 主题
  * @package Space
  * @author Sun
- * @version 1.0
+ * @version 1.0.1
  * 
  * @link https://www.imsun.org
  */
@@ -13,48 +13,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <!DOCTYPE html>
 <html>
   <head>
-    <?php $this->need('head.php'); ?>
-    <style>
-    
-    /* 分页 */
-    .pagination_page{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: var(--margin);
-        gap: 8px;
-    }
-    .pagination_page li.active a {
-        background: var(--theme);
-        color: #fff;
-        font-weight: 500;
-    }
-    .pagination_page a{
-        display: flex;
-        padding: 8px;
-        font-size: 16px;
-        width: 20px;
-        height: 20px;
-        background: var(--background);
-        border-radius: 50%;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        transition: 0.2s;
-        -webkit-transition: 0.2s;
-        justify-content: center;
-        align-items: center;
-        letter-spacing: 0;
-    }
-    .pagination_page span.next{
-        cursor: pointer;
-    }
-    .pagination_page li.active a:hover{
-        cursor: not-allowed;
-    }
-    /* 分页 */
-    </style>    
+    <?php $this->need('head.php'); ?>  
   </head>
   <body>
     <?php $this->need('header.php'); ?>
