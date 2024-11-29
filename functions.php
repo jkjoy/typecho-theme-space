@@ -1,6 +1,5 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
-require_once("single.php");
 function themeConfig($form) {
     $logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, NULL, _t('站点 LOGO 地址'));
     $form->addInput($logoUrl);
