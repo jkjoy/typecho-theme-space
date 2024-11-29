@@ -32,7 +32,7 @@
                         <p>     <?php $this->content(); ?> </p>
                     </div>
                 </div>
-                <?php $this->need('comments.php'); ?>
+                <?php $this->options->pinglun(); ?>
             </div>
         </article>
     </div>

@@ -46,7 +46,7 @@
                             </div>
                     </div>
                 </div>
-                <?php $this->need('comments.php'); ?>
+                <?php $this->options->pinglun(); ?>
             </div>
         </article>
     </div>
