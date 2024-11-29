@@ -372,16 +372,16 @@ p {
   }
 }
 .fh5co-post-entry.single-entry .fh5co-article-title {
-  font-size: 80px;
+  font-size: 40px;
 }
 @media screen and (max-width: 992px) {
   .fh5co-post-entry.single-entry .fh5co-article-title {
-    font-size: 56px;
+    font-size: 28px;
   }
 }
 @media screen and (max-width: 768px) {
   .fh5co-post-entry.single-entry .fh5co-article-title {
-    font-size: 34px;
+    font-size: 17px;
   }
 }
 .fh5co-post-entry article {
@@ -12773,3 +12773,14 @@ html[xmlns] .flexslider .slides {
       cursor: not-allowed;
   }
   /* 分页 */
+          /* 默认情况下显示元素 */
+          #fh5co-logo {
+            visibility: visible;
+        }
+
+        /* 当页面宽度小于800px时隐藏元素，但保留占位空间 */
+        @media (max-width: 888px) {
+            #fh5co-logo {
+                visibility: hidden;
+            }
+        }

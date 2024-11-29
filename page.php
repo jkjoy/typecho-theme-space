@@ -22,9 +22,8 @@
             <h2 class="fh5co-article-title animate-box"><?php $this->title() ?></h2>
             <ol class="breadcrumb fh5co-meta fh5co-date animate-box" style="margin-bottom:0; background-color:#f8f9fa">
                 <li><?php $this->date('Y-m-d'); ?></li>
-                <li><?php $this->category(','); ?></li>
                 <li><?php get_post_view($this) ?></li>
-                <li><a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('0 评论', '1 评论', '%d 评论'); ?></a></li>
+                <li> </li>
             </ol>
             <div class="col-lg-12 col-lg-offset-0 col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0 col-xs-12 col-xs-offset-0 text-left content-article">
                 <div class="row">
