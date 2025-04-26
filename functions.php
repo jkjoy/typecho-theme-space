@@ -96,28 +96,20 @@ function img_postthumb($cid) {
 
 // 单独生成目录项
 function handleToc($obj, $n, &$html) {
-    // 使用 htmlentities 处理内容
-    $html .= '<li><a href="#menu_index_' . $n . '">' . htmlentities($obj->textContent, ENT_QUOTES, 'UTF-8') . '</a></li>';
+    $html .= '<li><a href="#menu_index_' . $n . '">' . htmlentities($obj->textContent) . '</a></li>';
 }
-
 // 更新后的 toc 函数将返回一个只包含 <li> 的列表
 function toc($content) {
     $html = '<ul class="markdownIt-TOC">'; // 开始一个新的无序列表
     $dom = new DOMDocument();
-    // 设置错误处理
     libxml_use_internal_errors(true);
-    // 将内容包装在一个完整的 HTML 文档中，并指定 UTF-8 编码
-    $content = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $content . '</body></html>';
-    $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    // 恢复错误处理
+    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
     libxml_use_internal_errors(false);
-    // 使用 XPath 查询所有标题元素
     $xpath = new DOMXPath($dom);
-    $objs = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');  
+    $objs = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');
     if ($objs->length) {
         foreach ($objs as $n => $obj) {
-            // 设置每个标题元素的 id 属性
-            $obj->setAttribute('id', 'menu_index_' . ($n + 1));
+            $obj->setAttribute('id', 'TOC' . ($n + 1));
             handleToc($obj, $n + 1, $html);
         }
     }

@@ -7,7 +7,7 @@
             <figure class="animate-box">
             <?php if($this->fields->cover): ?>
                 <img src="<?php $this->fields->cover(); ?>" alt="<?php $this->title() ?>" class="img-responsive">
-            <?php endif; ?>     
+            <?php endif; ?>
             </figure>
             <span class="fh5co-meta animate-box">
                     <div class="tag-container">

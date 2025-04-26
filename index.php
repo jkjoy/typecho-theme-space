@@ -13,7 +13,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <?php $this->need('head.php'); ?>  
 <?php $this->need('header.php'); ?>
     <div class="container-fluid">
-      <div class="row fh5co-post-entry">
+    <div class="row fh5co-post-entry">
 	  <?php while($this->next()): ?>
             <article class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-xxs-12 animate-box" style="height: 25em;">
             <figure class="img-box">
@@ -36,7 +36,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
             </h3>
             <span class="fh5co-meta fh5co-date"><?php $this->date('Y-m-d'); ?></span>
           </article>
-		<?php endwhile; ?>
+		  <?php endwhile; ?>
       </div>
 		  <?php
             $this->pagenav(
