@@ -1,4 +1,12 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
+<!-- 返回顶部 -->
+<div class="back-to-top">
+        <a href="#!" id="tool-toc" class="hidden-xs hidden-sm">
+            <i class="fa fa-map"></i>
+        </a>
+        <br> 
+    <a href="#top" class="hidden-xs hidden-sm"><i class="fa fa-paper-plane"></i></a>
+</div> 
 <!-- jQuery -->
 <script src="<?php $this->options->themeUrl('/media/scripts/jquery.min.js');?>"></script>
 <!-- img lazy load -->
@@ -14,7 +22,7 @@
 <!-- Md5 Min JS -->
 <script src="<?php $this->options->themeUrl('/media/scripts/md5.min.js');?>"></script>
 <!-- highlight -->
-<script src="https://cdn.bootcss.com/highlight.js/9.15.8/highlight.min.js"></script>
+<script src="<?php $this->options->themeUrl('/media/scripts/highlight.min.js');?>"></script>
 <script type="application/javascript">
     // 代码高亮
     hljs.initHighlightingOnLoad();
@@ -36,3 +44,5 @@
 &copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>. 主题：<a target="_blank" href="https://imsun.org">Space</a>
 <?php $this->options->tongji(); ?>
 </footer>
+</body>
+</html>

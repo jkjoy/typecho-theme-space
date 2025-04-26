@@ -52,25 +52,48 @@ function get_post_view($archive) {
     }
     echo $row['views'];
 }
+/**
+ * 获取文章缩略图（优先自定义字段 cover，其次文章图片，最后默认图片）
+ * @param int $cid 文章ID
+ * @return string 图片URL
+ */
+function getPostThumbnail($cid) {
+    $db = Typecho_Db::get();
+    // 1. 优先检查自定义字段 cover
+    $cover = $db->fetchRow($db->select('table.fields.str_value')
+        ->from('table.fields')
+        ->where('table.fields.cid = ?', $cid)
+        ->where('table.fields.name = ?', 'cover'));
+    if ($cover && !empty($cover['str_value'])) {
+        return $cover['str_value']; // 直接返回 cover 字段的图片URL
+    }
+    // 2. 如果没有 cover，尝试获取文章内容中的第一张图片
+    $thumbFromContent = img_postthumb($cid);
+    if (!empty($thumbFromContent)) {
+        return $thumbFromContent;
+    }
+    // 3. 如果前两者都没有，返回后台设置的默认图片（bgUrl）
+    $options = Typecho_Widget::widget('Widget_Options');
+    return $options->bgUrl ?? ''; // 如果 bgUrl 未设置，返回空字符串
+}
+
+/**
+ * 从文章内容中提取第一张图片（原函数）
+ */
 function img_postthumb($cid) {
     $db = Typecho_Db::get();
     $rs = $db->fetchRow($db->select('table.contents.text')
         ->from('table.contents')
-        ->where('table.contents.cid=?', $cid)
-        ->order('table.contents.cid', Typecho_Db::SORT_ASC)
-        ->limit(1));
-    // 检查是否获取到结果
-    if (!$rs) {
+        ->where('table.contents.cid = ?', $cid)
+        ->limit(1)); 
+    if (!$rs || empty($rs['text'])) {
         return "";
     }
-    preg_match_all("/https?:\/\/[^\s]*.(png|jpeg|jpg|gif|bmp|webp)/", $rs['text'], $thumbUrl);  //通过正则式获取图片地址
-    // 检查是否匹配到图片URL
-    if (count($thumbUrl[0]) > 0) {
-        return $thumbUrl[0][0];  // 返回第一张图片的URL
-    } else {
-        return "";  // 没有匹配到图片URL，返回空字符串
-    }
+    // 正则匹配图片URL
+    preg_match_all("/https?:\/\/[^\s]*\.(png|jpeg|jpg|gif|bmp|webp)/i", $rs['text'], $matches);
+    return $matches[0][0] ?? ""; // 返回第一张图片或空字符串
 }
+
 // 单独生成目录项
 function handleToc($obj, $n, &$html) {
     // 使用 htmlentities 处理内容
@@ -81,21 +104,16 @@ function handleToc($obj, $n, &$html) {
 function toc($content) {
     $html = '<ul class="markdownIt-TOC">'; // 开始一个新的无序列表
     $dom = new DOMDocument();
-    
     // 设置错误处理
     libxml_use_internal_errors(true);
-
     // 将内容包装在一个完整的 HTML 文档中，并指定 UTF-8 编码
     $content = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $content . '</body></html>';
     $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
     // 恢复错误处理
     libxml_use_internal_errors(false);
-
     // 使用 XPath 查询所有标题元素
     $xpath = new DOMXPath($dom);
-    $objs = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');
-    
+    $objs = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');  
     if ($objs->length) {
         foreach ($objs as $n => $obj) {
             // 设置每个标题元素的 id 属性

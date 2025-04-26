@@ -1,4 +1,7 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
+<!DOCTYPE html>
+<html>
+<head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title><?php if($this->_currentPage>1) echo '第 '.$this->_currentPage.' 页 - '; ?><?php $this->archiveTitle(array(
@@ -19,3 +22,4 @@
 <?php if($this -> options -> cssdiy): ?>
 <style><?php $this->options->cssdiy() ?></style>
 <?php endif; ?>
+</head>

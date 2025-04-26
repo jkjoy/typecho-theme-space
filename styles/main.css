@@ -4998,9 +4998,11 @@ img {
 }
 .img-responsive {
   display: block;
-  max-width: 100%;
-  height: auto;
-  margin: auto;
+  max-width: 100%;       /* 宽度自适应容器 */
+  aspect-ratio: 3/1;  
+  object-fit: cover; /* 居中裁剪 */
+  object-position: center; /* 确保裁剪居中 */
+  margin: auto;      /* 水平居中（可选） */
 }
 .img-rounded {
   border-radius: 6px;

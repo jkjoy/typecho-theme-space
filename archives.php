@@ -1,18 +1,12 @@
 <?php 
 /**
- * 归档
+ * 文章归档
  *
  * @package custom
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
-<!DOCTYPE html>
-<html>
-<head>
 <?php $this->need('head.php'); ?>
-</head>
-<body>
 <?php $this->need('header.php'); ?>
-
 <div class="container-fluid">
     <div class="row fh5co-post-entry single-entry">
         <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-12 col-xs-offset-0 animate-box">
@@ -21,13 +15,13 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
                     <h2 class="text-center archives-title">
                         <i class="fa fa-archive"></i> 文章归档
                     </h2>
-                    <?php
+<?php
 $stat = Typecho_Widget::widget('Widget_Stat');
 Typecho_Widget::widget('Widget_Contents_Post_Recent', 'pageSize=' . $stat->publishedPostsNum)->to($archives);
 $year = 0;
 $output = '<div class="row post-group">'; // Start archives container
 while ($archives->next()) {
-    $year_tmp = date('Y', $archives->created);
+$year_tmp = date('Y', $archives->created);
     // 检查是否需要新的年份标题
     if ($year != $year_tmp) {
         if ($year > 0) {
@@ -56,5 +50,3 @@ echo $output;
     </div>
 </div>
 <?php $this->need('footer.php'); ?>
-</body>
-</html>

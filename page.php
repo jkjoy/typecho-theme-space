@@ -1,10 +1,5 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
-<!DOCTYPE html>
-<html>
-<head>
 <?php $this->need('head.php'); ?>
-</head>
-<body>
 <?php $this->need('header.php'); ?>
 <div class="container-fluid">
     <div class="row fh5co-post-entry single-entry">
@@ -36,17 +31,4 @@
         </article>
     </div>
 </div>
-<div class="back-to-top">
-        <a href="#!" id="tool-toc" class="hidden-xs hidden-sm">
-            <i class="fa fa-map"></i>
-        </a>
-        <br>
-    <a href="#top" class="hidden-xs hidden-sm"><i class="fa fa-paper-plane"></i></a>
-</div> 
-    <!-- 返回顶部 -->
-    <div class="post-toc animated fadeInRight hidden-xs hidden-sm" style="display: none;">
-    <?php echo toc($this->content); ?>
-    </div>
-    <?php $this->need('footer.php'); ?>  
-</body>
-</html>
+<?php $this->need('footer.php'); ?>  
