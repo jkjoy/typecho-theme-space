@@ -23,10 +23,14 @@
             <div class="col-lg-12 col-lg-offset-0 col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0 col-xs-12 col-xs-offset-0 text-left content-article">
                 <div class="row">
                     <div class="col-md-12 animate-box post-content">
-                        <p>     <?php $this->content(); ?> </p>
+                        <?php $this->content(); ?>
                     </div>
                 </div>
+                <?php if ($this->options->pinglun): ?>
                 <?php $this->options->pinglun(); ?>
+                <?php else: ?>
+                <?php $this->need('comments.php'); ?> 
+                <?php endif; ?>
             </div>
         </article>
     </div>
