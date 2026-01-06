@@ -26,6 +26,11 @@ function themeConfig($form) {
     $cssdiy = new Typecho_Widget_Helper_Form_Element_Textarea('cssdiy', NULL, NULL, _t('自定义CSS'));
     $form->addInput($cssdiy);
 }
+
+/**
+ * 文章浏览次数统计函数
+ * @param Typecho_Widget $archive 文章对象
+ */
 function get_post_view($archive) {
     $cid = $archive->cid;
     $db = Typecho_Db::get();
@@ -52,6 +57,7 @@ function get_post_view($archive) {
     }
     echo $row['views'];
 }
+
 /**
  * 获取文章缩略图（优先自定义字段 cover，其次文章图片，最后默认图片）
  * @param int $cid 文章ID
@@ -94,25 +100,206 @@ function img_postthumb($cid) {
     return $matches[0][0] ?? ""; // 返回第一张图片或空字符串
 }
 
-// 单独生成目录项
-function handleToc($obj, $n, &$html) {
-    $html .= '<li><a href="#menu_index_' . $n . '">' . htmlentities($obj->textContent) . '</a></li>';
+function space_toc_slugify($text) {
+    $text = html_entity_decode(strip_tags((string)$text), ENT_QUOTES, 'UTF-8');
+    $text = trim(preg_replace('/\s+/u', ' ', $text));
+    if (function_exists('mb_strtolower')) {
+        $text = mb_strtolower($text, 'UTF-8');
+    } else {
+        $text = strtolower($text);
+    }
+    $text = preg_replace('/[^\p{L}\p{N}\s\-_]+/u', '', $text);
+    $text = trim(preg_replace('/[\s\_]+/u', '-', $text), '-');
+    return $text !== '' ? $text : 'section';
 }
-// 更新后的 toc 函数将返回一个只包含 <li> 的列表
-function toc($content) {
-    $html = '<ul class="markdownIt-TOC">'; // 开始一个新的无序列表
-    $dom = new DOMDocument();
-    libxml_use_internal_errors(true);
-    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
-    libxml_use_internal_errors(false);
+
+function space_toc_dom_inner_html($node) {
+    if (!$node || !isset($node->childNodes)) {
+        return '';
+    }
+    $html = '';
+    foreach ($node->childNodes as $child) {
+        $html .= $node->ownerDocument->saveHTML($child);
+    }
+    return $html;
+}
+
+function space_build_toc($html, $options = array()) {
+    $options = array_merge(array(
+        'title' => '目录',
+        'minHeadings' => 2,
+        'minLevel' => 2,
+        'maxLevel' => 6,
+        'idPrefix' => 'toc-',
+    ), is_array($options) ? $options : array());
+
+    $result = array('content' => (string)$html, 'toc' => '');
+    if (trim(strip_tags((string)$html)) === '') {
+        return $result;
+    }
+    if (!class_exists('DOMDocument')) {
+        return $result;
+    }
+
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $previousUseErrors = libxml_use_internal_errors(true);
+
+    $wrapId = '__space_toc_root__';
+    $wrappedHtml = '<!doctype html><html><head><meta charset="utf-8"></head><body><div id="' . $wrapId . '">' . $html . '</div></body></html>';
+    $loaded = $dom->loadHTML($wrappedHtml, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+    libxml_clear_errors();
+    libxml_use_internal_errors($previousUseErrors);
+    if (!$loaded) {
+        return $result;
+    }
+
+    $root = $dom->getElementById($wrapId);
+    if (!$root) {
+        return $result;
+    }
+
     $xpath = new DOMXPath($dom);
-    $objs = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');
-    if ($objs->length) {
-        foreach ($objs as $n => $obj) {
-            $obj->setAttribute('id', 'TOC' . ($n + 1));
-            handleToc($obj, $n + 1, $html);
+    $headingNodes = $xpath->query('.//h1|.//h2|.//h3|.//h4|.//h5|.//h6', $root);
+    if (!$headingNodes || $headingNodes->length === 0) {
+        $result['content'] = space_toc_dom_inner_html($root);
+        return $result;
+    }
+
+    $allHeadings = array();
+    $minFoundLevel = 6;
+    foreach ($headingNodes as $node) {
+        $level = (int)substr($node->nodeName, 1);
+        if ($level < 1 || $level > 6) {
+            continue;
+        }
+        $minFoundLevel = min($minFoundLevel, $level);
+        $allHeadings[] = array('node' => $node, 'level' => $level);
+    }
+
+    if (!$allHeadings) {
+        $result['content'] = space_toc_dom_inner_html($root);
+        return $result;
+    }
+
+    $minLevel = (int)$options['minLevel'];
+    $maxLevel = (int)$options['maxLevel'];
+    $hasAtOrAboveMin = false;
+    foreach ($allHeadings as $h) {
+        if ($h['level'] >= $minLevel && $h['level'] <= $maxLevel) {
+            $hasAtOrAboveMin = true;
+            break;
         }
     }
-    $html .= '</ul>'; // 结束无序列表
-    return $html;
+    if (!$hasAtOrAboveMin) {
+        $minLevel = $minFoundLevel;
+    }
+
+    $idCounts = array();
+    $existingIdNodes = $xpath->query('.//*[@id]', $root);
+    if ($existingIdNodes) {
+        foreach ($existingIdNodes as $n) {
+            $id = trim($n->getAttribute('id'));
+            if ($id !== '') {
+                if (!isset($idCounts[$id])) {
+                    $idCounts[$id] = 0;
+                }
+                $idCounts[$id]++;
+            }
+        }
+    }
+
+    $items = array();
+    $usedHeadingIds = array();
+    foreach ($allHeadings as $h) {
+        $level = $h['level'];
+        if ($level < $minLevel || $level > $maxLevel) {
+            continue;
+        }
+        $node = $h['node'];
+        $text = trim(preg_replace('/\s+/u', ' ', $node->textContent));
+        if ($text === '') {
+            continue;
+        }
+
+        $id = trim($node->getAttribute('id'));
+        if ($id !== '' && isset($idCounts[$id]) && $idCounts[$id] === 1 && !isset($usedHeadingIds[$id])) {
+            // keep existing unique id
+        } else {
+            $base = $options['idPrefix'] . space_toc_slugify($text);
+            $candidate = $base;
+            $suffix = 2;
+            while (isset($idCounts[$candidate]) || isset($usedHeadingIds[$candidate])) {
+                $candidate = $base . '-' . $suffix;
+                $suffix++;
+            }
+            $id = $candidate;
+        }
+
+        $node->setAttribute('id', $id);
+        $node->setAttribute('tabindex', '-1');
+        $usedHeadingIds[$id] = true;
+
+        $items[] = array('id' => $id, 'level' => $level, 'text' => $text);
+    }
+
+    $result['content'] = space_toc_dom_inner_html($root);
+
+    if (count($items) < (int)$options['minHeadings']) {
+        return $result;
+    }
+
+    $baseLevel = 6;
+    foreach ($items as $it) {
+        $baseLevel = min($baseLevel, (int)$it['level']);
+    }
+
+    $toc = '<nav class="toc" aria-label="' . htmlspecialchars($options['title'], ENT_QUOTES, 'UTF-8') . '">';
+    $toc .= '<div class="toc-title">' . htmlspecialchars($options['title'], ENT_QUOTES, 'UTF-8') . '</div>';
+    $toc .= '<ul class="toc-list">';
+
+    $prevLevel = $baseLevel;
+    $first = true;
+    foreach ($items as $it) {
+        $level = (int)$it['level'];
+        if ($first) {
+            $first = false;
+        } else {
+            if ($level === $prevLevel) {
+                $toc .= '</li>';
+            } elseif ($level > $prevLevel) {
+                while ($level > $prevLevel) {
+                    $toc .= '<ul class="toc-list">';
+                    $prevLevel++;
+                }
+            } else {
+                $toc .= '</li>';
+                while ($level < $prevLevel) {
+                    $toc .= '</ul></li>';
+                    $prevLevel--;
+                }
+            }
+        }
+
+        $toc .= '<li class="toc-item toc-level-' . $level . '">';
+        $toc .= '<a class="toc-link" href="#' . htmlspecialchars($it['id'], ENT_QUOTES, 'UTF-8') . '">';
+        $toc .= htmlspecialchars($it['text'], ENT_QUOTES, 'UTF-8');
+        $toc .= '</a>';
+    }
+
+    $toc .= '</li>';
+    while ($prevLevel > $baseLevel) {
+        $toc .= '</ul></li>';
+        $prevLevel--;
+    }
+    $toc .= '</ul></nav>';
+
+    $result['toc'] = $toc;
+    return $result;
+}
+
+if (!function_exists('toc')) {
+    function toc($content) {
+        $built = space_build_toc($content);
+        return $built['toc'];
+    }
 }

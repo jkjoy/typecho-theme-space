@@ -28,11 +28,17 @@
                 <li></li>
             </ol>
             <div class="col-lg-12 col-lg-offset-0 col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0 col-xs-12 col-xs-offset-0 text-left content-article">
-                <div class="row">
-                    <div class="col-md-12 animate-box post-content">
-                        <?php $this->content(); ?>
-                    </div>
-                </div>
+	                <div class="row">
+	                    <div class="col-md-12 animate-box post-content">
+	                        <?php
+	                            ob_start();
+	                            $this->content();
+	                            $spacePostContent = ob_get_clean();
+	                            $spaceTocData = space_build_toc($spacePostContent);
+	                            echo $spaceTocData['content'];
+	                        ?>
+	                    </div>
+	                </div>
                 <div class="row">
                     <div class="col-md-12 animate-box">
                             <div class="next-post">
@@ -52,7 +58,9 @@
         </article>
     </div>
 </div>
-<div class="post-toc animated fadeInRight hidden-xs hidden-sm" style="display: none;">
-    <?php echo toc($this->content); ?>
-</div>
-<?php $this->need('footer.php'); ?>    
+	<?php if (!empty($spaceTocData['toc'])): ?>
+	<div class="post-toc animated fadeInRight hidden-xs hidden-sm" style="display: none;">
+	    <?php echo $spaceTocData['toc']; ?>
+	</div>
+	<?php endif; ?>
+	<?php $this->need('footer.php'); ?>    

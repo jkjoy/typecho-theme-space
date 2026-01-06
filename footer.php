@@ -33,19 +33,79 @@
     // 代码高亮
     hljs.initHighlightingOnLoad();
     // img 懒加载
-    $(function () {
-        $("img.lazy").lazyload({
-            effect: "fadeIn",  // 懒加载动画
-            threshold: 180  // 在图片距离屏幕180px时提前载入
-        });
-        // tooltip
-        $('[data-toggle="tooltip"]').tooltip();
-        // 目录
-        $('#tool-toc').click(function () {
-            $('.post-toc').toggle();
-        });
-});
-</script>
+	    $(function () {
+	        $("img.lazy").lazyload({
+	            effect: "fadeIn",  // 懒加载动画
+	            threshold: 180  // 在图片距离屏幕180px时提前载入
+	        });
+	        // tooltip
+	        $('[data-toggle="tooltip"]').tooltip();
+	        // 目录
+	        var $tocWrap = $('.post-toc');
+	        var $toc = $tocWrap.find('.toc');
+	        if (!$toc.length) {
+	            $('#tool-toc').hide();
+	        } else {
+	            $('#tool-toc').on('click', function (e) {
+	                e.preventDefault();
+	                $tocWrap.toggle();
+	            });
+
+	            $tocWrap.on('click', 'a.toc-link', function (e) {
+	                var href = $(this).attr('href') || '';
+	                if (href.charAt(0) !== '#') return;
+	                var target = document.getElementById(href.slice(1));
+	                if (!target) return;
+	                e.preventDefault();
+	                var top = target.getBoundingClientRect().top + window.pageYOffset - 20;
+	                window.scrollTo({ top: top, behavior: 'smooth' });
+	                if (history && history.replaceState) {
+	                    history.replaceState(null, '', href);
+	                }
+	            });
+
+	            var headings = [];
+	            function refreshHeadings() {
+	                headings = [];
+	                $toc.find('a.toc-link').each(function () {
+	                    var hash = this.hash || '';
+	                    if (!hash) return;
+	                    var el = document.getElementById(hash.slice(1));
+	                    if (!el) return;
+	                    headings.push({ id: hash.slice(1), el: el, top: 0 });
+	                });
+	                headings.forEach(function (h) {
+	                    h.top = h.el.getBoundingClientRect().top + window.pageYOffset;
+	                });
+	                headings.sort(function (a, b) { return a.top - b.top; });
+	            }
+	            refreshHeadings();
+	            $(window).on('resize', refreshHeadings);
+
+	            var ticking = false;
+	            function updateActiveLink() {
+	                ticking = false;
+	                var scrollPos = window.pageYOffset + 80;
+	                var currentId = null;
+	                for (var i = 0; i < headings.length; i++) {
+	                    if (headings[i].top <= scrollPos) currentId = headings[i].id;
+	                    else break;
+	                }
+	                if (!currentId && headings.length) currentId = headings[0].id;
+	                if (!currentId) return;
+	                $toc.find('a.toc-link').removeClass('is-active').filter(function () {
+	                    return this.hash === '#' + currentId;
+	                }).addClass('is-active');
+	            }
+	            $(window).on('scroll', function () {
+	                if (ticking) return;
+	                ticking = true;
+	                window.requestAnimationFrame(updateActiveLink);
+	            });
+	            updateActiveLink();
+	        }
+	});
+	</script>
 <footer id="fh5co-footer">
 &copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>. 主题：<a target="_blank" href="https://imsun.org">Space</a>
 <?php $this->options->tongji(); ?>

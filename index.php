@@ -1,11 +1,9 @@
 <?php
 /**
  * Space  for  Typecho
- * 来自于 gridea 主题
  * @package Space
  * @author Sun
- * @version 1.1.0
- * 
+ * @version 1.1.1
  * @link https://www.imsun.org
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit; 
@@ -20,10 +18,11 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
               <a href="<?php $this->permalink() ?>">
               <?php
                   $thumb = getPostThumbnail($this->cid);
+                  $bgurl = Helper::options()->bgUrl ?? 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MDAgMzUwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjM1MCI+CiAgPHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSIzNTAiIGZpbGw9IiNjY2NjY2MiPjwvcmVjdD4KICA8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyNnB4IiBmaWxsPSIjMzMzMzMzIj7mmoLml6Dlm77niYc8L3RleHQ+ICAgCjwvc3ZnPg==';
                   if (!empty($thumb)) {
                      echo '<img data-original="' . $thumb . '" alt="<?php $this->title() ?>" class="img-responsive img-rounded lazy">';
                     } else {
-                      echo '<img src="https://pic.0tz.top/api" alt="无图片" class="img-responsive img-rounded lazy">';
+                      echo '<img src="' . $bgurl . '" alt="无图片" class="img-responsive img-rounded lazy">';
                     }
                 ?>
               </a>
